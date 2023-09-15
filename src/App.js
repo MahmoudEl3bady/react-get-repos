@@ -1,23 +1,49 @@
-import logo from './logo.svg';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+import Header from './components/Header.jsx';
+import Repos from './components/Repos';
+import { useState ,useEffect} from 'react';
 
 function App() {
+
+const [repos,setRepos]=useState(null);
+const [isPending,setIsPending] = useState(true);
+const [userName,setuserName] = useState(''); 
+
+
+   // Input 
+   const handleChange =(event)=>{
+    setuserName(event.target.value);
+  }
+
+
+
+// Fetch the reposotories
+
+    const fetchData = async ()=> {
+      const respon = await fetch(`https://api.github.com/users/${userName}/repos`);
+      const data = await respon.json();
+      // return(data);
+      setRepos(data);
+    }
+    useEffect(()=>{
+        const getRepos = async()=>{
+            const reposFromServer =await fetchData();
+            setRepos(reposFromServer);
+        }
+        getRepos();
+    },[]);
+
+
+ 
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Header handleClick={fetchData} userName={userName} onChange={handleChange}/>
+        <Repos repos={repos} user={userName}/>
     </div>
   );
 }
